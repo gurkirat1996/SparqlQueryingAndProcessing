@@ -1,0 +1,14 @@
+1. Fold/unfold parallel threaded compilation.
+Remarks- dhawal- Compiles now.
+
+2. B+ tree in Berkeley DB with bulk, without bulk, and with threads, without threads.
+Remarks- gurkirat- fwd/rev queries give correct results. Threading and bulk loading left.
+
+3. Complete AST to BitMat graph translation.
+Remarks- dhawal- We have written the function (ast-to-graph-function.cpp), it inserts jvars and tp into graph. 
+There was a negative id question (which I have emailed). Please review the code to see if anything is missing, we will then integrate it into bitmat.
+
+4. Performance parameter tweaking of BDB.
+Remarks- gurkirat- tweaking left.
+5. Comparison chart.
+6. Cold cache vs warm cache (/bin/sync, echo 3 > /proc/sys/vm/drop_caches needs sudo perms).

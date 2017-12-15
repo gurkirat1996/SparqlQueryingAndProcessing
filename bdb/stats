@@ -1,0 +1,5 @@
+BDB->
+	forward creation time - 150 min
+	reverse creation time - 16-20 min
+	reverse querying time for 1e6 queries - 34 min
+	bulk creation reverse - > 1hour.

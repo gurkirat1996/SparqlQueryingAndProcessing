@@ -1,0 +1,11 @@
+BASE <http://www.myexperiment.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX meannot: <http://rdf.myexperiment.org/ontologies/annotations/>
+PREFIX mebase: <http://rdf.myexperiment.org/ontologies/base/>
+SELECT ?annotation ?annotator
+WHERE{
+  ?annotation mebase:annotates <workflows/72> .
+  { ?annotation rdf:type meannot:Comment } 
+    union { ?annotation rdf:type meannot:Rating } .
+  ?annotation mebase:has-annotator ?annotator
+}

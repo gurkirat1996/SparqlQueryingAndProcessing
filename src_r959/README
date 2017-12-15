@@ -1,0 +1,100 @@
+---------------------------------------------------------------------
+Common usage:
+./bitmat -l [y/n] -Q [y/n] -f configfile -q queryfile -o resultfile
+
+Description:
+  -l : Whether you want to load the data in BitMat format
+  -Q : Whether you want to query the data. If this option is "n" then
+       "-q" and "-o" options are ignored
+  -f : Configfile. Should be formed as given in sample
+  -q : Queryfile. Should be formed as given in sample
+  -r : Path to the results file
+
+---------------------------------------------------------------------
+
+Compiling:
+To compile the sources, follow two simple commands.
+
+$ cd src
+$ make
+
+---------------------------------------------------------------------
+
+DATA LOADING:
+=============
+
+Current BitMat code does not have way of parsing the RDF data. We use
+an external script for that purpose. The sample script is included
+in the "scripts" folder.
+
+The way of parsing the data and allocating unique IDs is same as
+described in http://www.cs.rpi.edu/~atrem/papers/www10_medha.pdf in
+Section 3.
+
+After the ID allocation is done, we transform all the triples into
+their ID representation. The original (S, P, O) triple is represented as
+"SID:PID:OID". A sample file for LUBM ata is given in the "scripts"
+folder.
+
+This file is then sorted in 4 different ways as:
+
+sort -u -n -t: -k2 -k1 -k3 encoded_triple_file > encoded_triple_file_spo
+sort -u -n -t: -k2 -k3 -k1 encoded_triple_file | awk -F: '{print $3":"$2":"$1}' > encoded_triple_file_ops
+sort -u -n -t: -k1 -k2 -k3 encoded_triple_file | awk -F: '{print $2":"$1":"$3}' > encoded_triple_file_pso
+sort -u -n -t: -k3 -k2 -k1 encoded_triple_file | awk -F: '{print $2":"$3":"$1}' > encoded_triple_file_pos
+
+This sorting gives us 4 different files where triples in their ID form
+are sorted on 4 different orders viz. PSO, POS, SPO, and OPS.
+
+We give paths to these 4 spo, ops, pso, and pos files in the configfile
+(refer to the sample config file in the "scripts" folder).
+
+----------------------------------------------------------------------
+
+CONFIG FILE:
+============
+
+Some important fields of cofig file:
+
+1) TABLE_COL_BYTES: This field defines the number of bytes used to store
+the offset of each BitMat inside the large file in which all BitMats are
+stored one after another. This field is typically keps as "5" bytes to
+allow for very large datasets. But for smaller datasets where the size
+of the large metafile holding all the BitMats won't be greater than 4GB,
+TABLE_COL_BYTES can be "4".
+
+2) NUM_COMMON_SO: This field gives the number of common subject and
+object URIs in the RDF dataset.
+
+----------------------------------------------------------------------
+
+QUERY PROCESSING:
+=================
+
+BitMat interface currently does not support a SPARQL parser. Each join
+query is represented as follows:
+
+1) Each join variable is assigned a negative integer ID.
+2) Each fixed position in the triple pattern is replaced by the
+respective string's ID (as was allocated during data loading step).
+3) Each non-distinguished variable (non-join variable) is assigned
+number "0".
+4) Each triple pattern is then represented as, e.g., "-1:23:0" where
+"-1" represents a join variable. "23" is the ID assigned to the
+predicate in the original triple pattern and "0" is represents a
+non-join variable in the query.
+A sample query file is given in the scripts folder.
+=============================================
+How to import BitMat code into Eclise CDT:
+
+1. Use Eclipse Juno eclipse-cpp-juno-SR2-linux-gtk-x86_64.tar.gz
+2. File -> Import -> C/C++ -> Existing code as Makefile Project
+   Select GNU Autotools Toolchain under "Toolchain for Indexer Settings"
+3. Select BitMat source folder (in my case $HOME/bitmatsrc/src/src_bmlist).
+4. Finish
+5. File -> Import -> C/C++ -> C/C++ Project Settings. Select "project.xml"
+   in src_bmlist folder. Finish.
+6. Right click on project BitMat -> Index -> Rebuild Index.
+7. Clean the project and rebuild.
+Voila... done.. with no indexer/parser errors!
+
